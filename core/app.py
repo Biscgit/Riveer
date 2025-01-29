@@ -1,5 +1,4 @@
 import logging
-import typing
 import atexit
 
 from core.graph import NodeGraph
@@ -12,6 +11,7 @@ from core.node import Spring, Flow, Delta
 
 
 class AppController:
+    """This is the central controller of the app."""
 
     def load(self) -> None:
         logging.info("Initializing modules.")
@@ -48,7 +48,9 @@ class AppController:
         pipe_type = file_config["pipe"]
         cls = Modules.get_node_cls(pipe_type, file_config["type"])
 
-        NodeGraph.register_node(file_config["name"], cls.from_configuration(base_config))
+        NodeGraph.register_node(
+            file_config["name"], cls.from_configuration(base_config)
+        )
 
     @staticmethod
     def _establish_connections():

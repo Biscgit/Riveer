@@ -12,12 +12,12 @@ if typing.TYPE_CHECKING:
 
 class CronTask:
     def __init__(
-            self,
-            source: "PipeWriter",
-            task_name: str,
-            task_schedule: str,
-            task_args: list | tuple,
-            task_outputs: list[str],
+        self,
+        source: "PipeWriter",
+        task_name: str,
+        task_schedule: str,
+        task_args: list | tuple,
+        task_outputs: list[str],
     ):
         self._source = source
         self._name = task_name
@@ -53,6 +53,8 @@ class CronTask:
                 NodeGraph.send_result(result, self._output_ids)
 
             except Exception as e:
-                logging.error(f"{e.__class__.__name__} | Task {task.name} failed to execute because: {e}")
+                logging.error(
+                    f"{e.__class__.__name__} | Task {task.name} failed to execute because: {e}"
+                )
 
         return inner

@@ -7,12 +7,12 @@ from core.app import AppController
 
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", logging.INFO),
-    format='[%(asctime)s: %(levelname)s/%(name)s] %(message)s'
+    format="[%(asctime)s: %(levelname)s/%(name)s] %(message)s",
 )
 
 app = Celery(
-    'metric_collector',
-    broker=os.getenv("COLLECTOR_BROKER", 'amqp://guest@localhost:5672//'),
+    "metric_collector",
+    broker=os.getenv("COLLECTOR_BROKER", "amqp://guest@localhost:5672//"),
 )
 app.conf.broker_connection_retry_on_startup = True
 

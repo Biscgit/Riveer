@@ -1,5 +1,6 @@
-import typing
 from abc import ABCMeta, abstractmethod
+import typing
+
 from celery import current_app as celery_app
 
 type Self = type["Self"]

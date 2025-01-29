@@ -1,7 +1,6 @@
-
 import importlib
-import pkgutil
 import inspect
+import pkgutil
 
 from core.node import Spring, Flow, Delta, BaseNode
 
@@ -57,7 +56,9 @@ class Modules:
 
         package_module = importlib.import_module("extensions")
 
-        for _, module_name, is_pkg in pkgutil.walk_packages(package_module.__path__, package_module.__name__ + "."):
+        for _, module_name, is_pkg in pkgutil.walk_packages(
+            package_module.__path__, package_module.__name__ + "."
+        ):
             if is_pkg:
                 continue
 

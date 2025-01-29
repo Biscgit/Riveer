@@ -1,8 +1,9 @@
 from itertools import chain
 import logging
-from core.node import Delta
 
 from opensearchpy import OpenSearch as OpenSearchConn
+
+from core.node import Delta
 
 
 class OpenSearch(Delta):
@@ -37,7 +38,7 @@ class OpenSearch(Delta):
 
         conn_conf = self._config["connection"]
         self._connection = OpenSearchConn(
-            hosts=[{'host': conn_conf["host"], 'port': conn_conf["port"]}],
+            hosts=[{"host": conn_conf["host"], "port": conn_conf["port"]}],
             http_compress=True,
             http_auth=(conn_conf["user"], conn_conf["password"]),
             use_ssl=conn_conf["use_ssl"],

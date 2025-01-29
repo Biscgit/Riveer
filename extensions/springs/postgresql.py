@@ -3,11 +3,10 @@ import logging
 import typing
 
 from psycopg2.extras import RealDictCursor
+from psycopg2.pool import ThreadedConnectionPool
 
 from core.node import Spring
 from core.task import CronTask
-
-from psycopg2.pool import ThreadedConnectionPool
 
 
 class PostgreSQL(Spring):

@@ -1,4 +1,3 @@
-import logging
 import typing
 
 if typing.TYPE_CHECKING:
@@ -9,6 +8,7 @@ type Data = list | dict
 
 class NodeGraph:
     """This holds the names of each Node that can be triggered."""
+
     _pipe_name_mapping: dict[str, "BaseNode"] = {}
 
     @staticmethod
@@ -27,7 +27,9 @@ class NodeGraph:
         NodeGraph._pipe_name_mapping[name] = node
 
     @staticmethod
-    def iter_over_nodes(*filter_cls: type["BaseNode"]) -> typing.Generator[tuple[str, "BaseNode"]]:
+    def iter_over_nodes(
+        *filter_cls: type["BaseNode"],
+    ) -> typing.Generator[tuple[str, "BaseNode"]]:
         for name, node in NodeGraph._pipe_name_mapping.items():
             if not filter_cls or isinstance(node, filter_cls):
                 yield (name, node)
