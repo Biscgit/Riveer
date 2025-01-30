@@ -81,8 +81,8 @@ class Flow(PipeWriter, PipeReader, metaclass=ABCMeta):
     def shutdown(self) -> None:
         return None
 
-    def get_periodic_tasks(self) -> typing.Generator["CronTask"]:
-        raise StopIteration()
+    def get_periodic_tasks(self) -> typing.Generator["CronTask"] | list:
+        return []
 
 
 class Delta(PipeReader, metaclass=ABCMeta):

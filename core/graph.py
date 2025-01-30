@@ -1,15 +1,16 @@
 import typing
 
 if typing.TYPE_CHECKING:
-    from core.node import BaseNode
+    from core.node import Delta, Flow, Spring
 
 type Data = list | dict
+type NodeType = typing.Union[Spring, Flow, Delta]
 
 
 class NodeGraph:
     """This holds the names of each Node that can be triggered."""
 
-    _pipe_name_mapping: dict[str, "BaseNode"] = {}
+    _pipe_name_mapping: dict[str, NodeType] = {}
 
     @staticmethod
     def send_result(data: Data, readers: list[str]) -> None:
@@ -20,7 +21,7 @@ class NodeGraph:
             node.function.delay(data)
 
     @staticmethod
-    def register_node(name: str, node: "BaseNode"):
+    def register_node(name: str, node: NodeType):
         if name in NodeGraph._pipe_name_mapping.keys():
             raise ValueError(f"Node of name `{name}` already exists.")
 
@@ -28,8 +29,8 @@ class NodeGraph:
 
     @staticmethod
     def iter_over_nodes(
-        *filter_cls: type["BaseNode"],
-    ) -> typing.Generator[tuple[str, "BaseNode"]]:
+            *filter_cls: type[NodeType],
+    ) -> typing.Generator[tuple[str, NodeType]]:
         for name, node in NodeGraph._pipe_name_mapping.items():
             if not filter_cls or isinstance(node, filter_cls):
-                yield (name, node)
+                yield name, node
