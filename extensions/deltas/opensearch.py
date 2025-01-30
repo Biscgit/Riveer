@@ -1,7 +1,7 @@
-from itertools import chain
 import logging
 
 from opensearchpy import OpenSearch as OpenSearchConn
+from opensearchpy.helpers import parallel_bulk
 
 from core.node import Delta
 
@@ -51,12 +51,10 @@ class OpenSearch(Delta):
         # self._connection.indices.create(self._config["processing"]["index"])
 
     def function(self, data: list[dict], *args) -> None:
-        insert_index = {
-            "index": {
-                "_index": self._config["processing"]["index"]}}
-        payload = list(chain.from_iterable(
-            [(insert_index, val) for val in data]))
-        self._connection.bulk(payload)
+        proc_conf = self._config["processing"]
+        payload = [d | {"_index": proc_conf["index"]} for d in data]
+
+        parallel_bulk(self._connection, payload, request_timeout=proc_conf["timeout"])
 
     def shutdown(self) -> None:
         if self._connection is not None:

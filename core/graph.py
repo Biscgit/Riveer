@@ -15,7 +15,6 @@ class NodeGraph:
     @staticmethod
     def send_result(data: "Data", readers: list[str]) -> None:
         """Send a data object to many consumers."""
-        print(f"GOT RESULT to {readers}")
         for reader in readers:
             node = NodeGraph._pipe_name_mapping[reader]
             node.function.delay(data)
