@@ -1,12 +1,10 @@
 import logging
 import atexit
-
-from core.graph import NodeGraph
-from core.modules import Modules
-
 import os
 import yaml
 
+from core.graph import NodeGraph
+from core.modules import Modules
 from core.node import Spring, Flow, Delta
 
 
@@ -14,6 +12,7 @@ class AppController:
     """This is the central controller of the app."""
 
     def load(self) -> None:
+        """Loads the configurations into the app."""
         logging.info("Initializing modules.")
         Modules.initialize()
 
@@ -21,6 +20,7 @@ class AppController:
         self._load_configurations()
 
     def start(self):
+        """Starts the app and creates all tasks."""
         logging.info("Establishing connections")
         self._establish_connections()
 
@@ -36,7 +36,7 @@ class AppController:
         for file_name in os.listdir(folder):
             file_path = os.path.join(folder, file_name)
 
-            with open(file_path, "r") as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 base_config: dict = yaml.safe_load(f)
                 self._load_node(base_config)
 
@@ -67,6 +67,6 @@ class AppController:
     @staticmethod
     def _create_node_tasks():
         """Creates periodic tasks defined for Nodes."""
-        for name, node in NodeGraph.iter_over_nodes(Spring, Flow):
+        for _, node in NodeGraph.iter_over_nodes(Spring, Flow):
             for task in node.get_periodic_tasks():
                 task.schedule_task_function()

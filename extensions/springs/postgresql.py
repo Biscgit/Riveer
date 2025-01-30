@@ -90,4 +90,4 @@ class PostgreSQL(Spring):
     def shutdown(self) -> None:
         if self._connection is not None:
             self._connection.closeall()
-        logging.info(f"Closed all PostgreSQL connections for source {self.name}.")
+        logging.info("Closed all PostgreSQL connections for source %s.", self.name)

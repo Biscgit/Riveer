@@ -51,11 +51,14 @@ class OpenSearch(Delta):
         # self._connection.indices.create(self._config["processing"]["index"])
 
     def function(self, data: list[dict], *args) -> None:
-        insert_index = {"index": {"_index": self._config["processing"]["index"]}}
-        payload = list(chain.from_iterable([(insert_index, val) for val in data]))
+        insert_index = {
+            "index": {
+                "_index": self._config["processing"]["index"]}}
+        payload = list(chain.from_iterable(
+            [(insert_index, val) for val in data]))
         self._connection.bulk(payload)
 
     def shutdown(self) -> None:
         if self._connection is not None:
             self._connection.close()
-        logging.info(f"Closed all OpenSearch connections for sink {self.name}.")
+        logging.info("Closed all OpenSearch connections for sink %s.", self.name)

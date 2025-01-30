@@ -27,28 +27,29 @@ class Modules:
 
     @staticmethod
     def get_node_cls(pipe_type: str, pipe_id: str) -> NodeClass:
+        """Returns the corresponding node class to the type and class id"""
         try:
             if pipe_type == "spring":
                 return Modules._input_config_map[pipe_id]
-            elif pipe_type == "flow":
+            if pipe_type == "flow":
                 return Modules._transform_config_map[pipe_id]
-            elif pipe_type == "delta":
+            if pipe_type == "delta":
                 return Modules._output_config_map[pipe_id]
-            else:
-                raise ValueError(f"Node of type `{pipe_type}` is invalid.")
 
-        except KeyError:
-            raise ValueError(f"Node of name `{pipe_id}` is unknown.")
+            raise ValueError(f"Node of type `{pipe_type}` is invalid.")
+
+        except KeyError as e:
+            raise ValueError(f"Node of name `{pipe_id}` is unknown.") from e
 
     @staticmethod
-    def _add_node_cls(cls: NodeClass, mapping: dict):
+    def _add_node_cls(node_cls: NodeClass, mapping: dict):
         """Adds a new extension class to one of the dicts."""
-        name = cls.id()
+        name = node_cls.id()
 
         if name in mapping.keys():
             raise ValueError("Extension with same id already exists!")
 
-        mapping[name] = cls
+        mapping[name] = node_cls
 
     @staticmethod
     def _get_extension_cls():
@@ -65,5 +66,6 @@ class Modules:
             module = importlib.import_module(module_name)
 
             for _, cls in inspect.getmembers(module, inspect.isclass):
-                if issubclass(cls, BaseNode) and len(cls.__abstractmethods__) == 0:
+                if issubclass(cls, BaseNode) and len(
+                        cls.__abstractmethods__) == 0:
                     yield cls

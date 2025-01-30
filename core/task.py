@@ -12,12 +12,12 @@ if typing.TYPE_CHECKING:
 
 class CronTask:
     def __init__(
-        self,
-        source: "PipeWriter",
-        task_name: str,
-        task_schedule: str,
-        task_args: list | tuple,
-        task_outputs: list[str],
+            self,
+            source: "PipeWriter",
+            task_name: str,
+            task_schedule: str,
+            task_args: list | tuple,
+            task_outputs: list[str],
     ):
         self._source = source
         self._name = task_name
@@ -27,12 +27,13 @@ class CronTask:
 
     @staticmethod
     def _parse_cron(cron_str: str) -> crontab:
-        parts = {i: v for i, v in enumerate(cron_str.split(" "))}
+        parts = dict(enumerate(cron_str.split(" ")))
 
         fields = ["minute", "hour", "day_of_week", "day_of_month", "month_of_year"]
         return crontab(**{name: parts.get(i, "*") for i, name in enumerate(fields)})
 
     def schedule_task_function(self):
+        """Schedules a new task from the config of this object."""
         name = f"{self._source.node_type()}-{self._source.name}-{self._name}-schedule"
 
         task = celery_app.task(
@@ -54,7 +55,8 @@ class CronTask:
 
             except Exception as e:
                 logging.error(
-                    f"{e.__class__.__name__} | Task {task.name} failed to execute because: {e}"
+                    "%s | Task %s failed to execute because: %s",
+                    e.__class__.__name__, task.name, str(e)
                 )
 
         return inner

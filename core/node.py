@@ -3,11 +3,11 @@ import typing
 
 from celery import current_app as celery_app
 
-type Self = type["Self"]
-type Data = list | dict
-
 if typing.TYPE_CHECKING:
     from core.task import CronTask
+
+    type Self = type["Self"]
+    type Data = list | dict
 
 
 class BaseNode(metaclass=ABCMeta):
