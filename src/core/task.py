@@ -6,18 +6,20 @@ from celery import current_app as celery_app
 from src.core.graph import NodeGraph
 from src.core.node import PipeWriter, PipeReader
 
+logger = logging.getLogger("Tasks")
+
 
 class CronTask:
     def __init__(
-        self,
-        source: "PipeWriter",
-        task_name: str,
-        task_schedule: str,
-        task_args: list | tuple,
-        task_outputs: list[str],
+            self,
+            source: "PipeWriter",
+            task_name: str,
+            task_schedule: str,
+            task_args: list | tuple,
+            task_outputs: list[str],
     ):
         self._source = source
-        self.name = task_name
+        self.name = f"{source.node_type()}-{source.name}-{task_name}-schedule"
         self._schedule = self._parse_cron(task_schedule)
         self._task_args = task_args
         self._output_ids = task_outputs
@@ -47,7 +49,7 @@ class CronTask:
                 self.check_pipeline(output_id, stack + [node_id])
             return
 
-        logging.error(
+        logger.error(
             "Error from spring `%s` with pipeline stack: [ %s ]",
             self._source.name,
             " -> ".join(stack + [node_id]),
@@ -82,11 +84,13 @@ class CronTask:
 
         def inner(task, *args) -> None:
             try:
+                logger.info("Running Spring task `%s`", self.name)
+
                 result = func(*args)
                 NodeGraph.send_result(result, self._output_ids)
 
             except Exception as e:
-                logging.error(
+                logger.error(
                     "%s | Task %s failed to execute because: %s",
                     *(e.__class__.__name__, task.name, str(e)),
                 )
