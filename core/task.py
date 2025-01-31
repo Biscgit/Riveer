@@ -9,12 +9,12 @@ from core.node import PipeWriter, PipeReader
 
 class CronTask:
     def __init__(
-            self,
-            source: "PipeWriter",
-            task_name: str,
-            task_schedule: str,
-            task_args: list | tuple,
-            task_outputs: list[str],
+        self,
+        source: "PipeWriter",
+        task_name: str,
+        task_schedule: str,
+        task_args: list | tuple,
+        task_outputs: list[str],
     ):
         self._source = source
         self.name = task_name
@@ -88,9 +88,7 @@ class CronTask:
             except Exception as e:
                 logging.error(
                     "%s | Task %s failed to execute because: %s",
-                    e.__class__.__name__,
-                    task.name,
-                    str(e),
+                    *(e.__class__.__name__, task.name, str(e)),
                 )
 
         return inner

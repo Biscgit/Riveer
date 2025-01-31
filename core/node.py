@@ -24,7 +24,7 @@ class BaseNode(metaclass=ABCMeta):
             name=f"{self.node_type()}-{self.name}-node-process",
             bind=True,
         )
-        self.function = _func  # pylint: disable=E0202
+        self.function = _func
 
     @classmethod
     def id(cls) -> str:
@@ -60,7 +60,7 @@ class BaseNode(metaclass=ABCMeta):
         """This method is called for cleaning up on shutdown."""
 
     @abstractmethod
-    def function(self, data: "Data", *args) -> "Data":
+    def function(self, data: "Data", *args) -> "Data":  # pylint: disable=E0202
         """This function is executed on triggering the instance by another task.
         In the case of it being a source, this is triggered by the set schedules."""
 
