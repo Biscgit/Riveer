@@ -24,7 +24,7 @@ def load_application(**_kwargs):
 
     try:
         tc.load()
-        tc.start()
+        tc.prepare()
 
     except Exception as e:
         logging.critical("%s: Failed to setup", e.__class__.__name__)

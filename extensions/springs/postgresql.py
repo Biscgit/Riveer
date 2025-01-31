@@ -6,6 +6,7 @@ from psycopg2.extras import RealDictCursor
 from psycopg2.pool import ThreadedConnectionPool
 from voluptuous import Schema, All, Length, Coerce, Optional
 
+from core.app import EnvStr
 from core.node import Spring
 from core.task import CronTask
 
@@ -28,10 +29,10 @@ class PostgreSQL(Spring):
         return Schema(
             {
                 "connection": {
-                    "dbname": str,
-                    "user": str,
-                    Optional("password"): str,
-                    Optional("host"): str,
+                    "dbname": EnvStr(),
+                    "user": EnvStr(),
+                    Optional("password"): EnvStr(),
+                    Optional("host"): EnvStr(),
                     Optional("port"): Coerce(int),
                     Optional("minconn", default=1): Coerce(int),
                     Optional("maxconn", default=64): Coerce(int),
@@ -49,7 +50,7 @@ class PostgreSQL(Spring):
                                 ),
                             ),
                             Optional("timeout", default=60): Coerce(int),
-                            Optional("fields"): [All(str)],
+                            Optional("fields"): [str],
                         }
                     )
                 ],

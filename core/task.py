@@ -20,7 +20,7 @@ class CronTask:
         task_outputs: list[str],
     ):
         self._source = source
-        self._name = task_name
+        self.name = task_name
         self._schedule = self._parse_cron(task_schedule)
         self._task_args = task_args
         self._output_ids = task_outputs
@@ -34,7 +34,7 @@ class CronTask:
 
     def schedule_task_function(self):
         """Schedules a new task from the config of this object."""
-        name = f"{self._source.node_type()}-{self._source.name}-{self._name}-schedule"
+        name = f"{self._source.node_type()}-{self._source.name}-{self.name}-schedule"
 
         task = celery_app.task(
             self._pipe_integration(self._source.function),

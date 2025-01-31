@@ -1,7 +1,6 @@
 import atexit
 import logging
 import os
-import typing
 
 import yaml
 
@@ -11,10 +10,8 @@ from core.graph import NodeGraph
 from core.modules import Modules
 from core.node import Spring, Flow, Delta
 
-if typing.TYPE_CHECKING:
-    type ConfStruct = typing.Any | dict[str | ConfStruct]
-
-LowerVal = lambda t: All(t, Coerce(lambda s: s.lower()))
+LowerVal = lambda *t: All(Coerce(lambda s: str(s).lower()), *t)
+EnvStr = lambda *t: All(Coerce(lambda s: os.path.expandvars(str(s))), *t)
 
 
 class AppController:
@@ -28,8 +25,8 @@ class AppController:
         logging.info("Loading configurations.")
         self._load_configurations()
 
-    def start(self):
-        """Starts the app and creates all tasks."""
+    def prepare(self):
+        """Starts the app and initializes all loaded tasks."""
         logging.info("Establishing connections")
         self._establish_connections()
 
@@ -47,23 +44,12 @@ class AppController:
 
             with open(file_path, "r", encoding="utf-8") as f:
                 base_config: dict = yaml.safe_load(f)
-
                 default_name = file_name.rsplit(".")[0]
+
                 validated_config = self.get_header_schema(default_name)(base_config)
-                enriched_config = self.enrich_config(validated_config)
+                self._load_node(validated_config)
 
-                self._load_node(enriched_config)
-
-    def enrich_config(self, config: "ConfStruct") -> "ConfStruct":
-        if isinstance(config, str):
-            return os.path.expandvars(config)
-
-        if isinstance(config, typing.Iterable):
-            itr = config.items() if isinstance(config, dict) else enumerate(config)
-            for key, value in itr:
-                config[key] = self.enrich_config(value)
-
-        return config
+        # ToDo: check graph connections!
 
     @staticmethod
     def get_header_schema(default_name: str) -> "Schema":
@@ -71,8 +57,8 @@ class AppController:
         return Schema(
             {
                 "configuration": {
-                    "pipe": All(LowerVal(str), Any("spring", "flow", "delta")),
-                    "type": LowerVal(str),
+                    "pipe": LowerVal(Any("spring", "flow", "delta")),
+                    "type": LowerVal(),
                     Optional("name", default=default_name): LowerVal(str),
                 },
                 Any(str): Any(dict, list, str, int),
@@ -94,8 +80,12 @@ class AppController:
     @staticmethod
     def _establish_connections():
         """Runs `connect` for each IO-Node."""
-        for _, node in NodeGraph.iter_over_nodes(Spring, Delta):
-            node.connect()
+        for name, node in NodeGraph.iter_over_nodes(Spring, Delta):
+            try:
+                node.connect()
+            except Exception as e:
+                logging.error("Spring `%s` failed to connect to its source", name)
+                raise e
 
     @staticmethod
     def _shutdown():
@@ -106,6 +96,12 @@ class AppController:
     @staticmethod
     def _create_node_tasks():
         """Creates periodic tasks defined for Nodes."""
-        for _, node in NodeGraph.iter_over_nodes(Spring, Flow):
+        for name, node in NodeGraph.iter_over_nodes(Spring, Flow):
             for task in node.get_periodic_tasks():
-                task.schedule_task_function()
+                try:
+                    task.schedule_task_function()
+                except Exception as e:
+                    logging.error(
+                        "Failed to create task `%s` from node `%s`.", task.name, name
+                    )
+                    raise e

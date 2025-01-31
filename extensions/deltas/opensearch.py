@@ -4,6 +4,7 @@ from opensearchpy import OpenSearch as OpenSearchConn
 from opensearchpy.helpers import parallel_bulk
 from voluptuous import Schema, Coerce, Optional
 
+from core.app import EnvStr
 from core.node import Delta
 
 
@@ -25,19 +26,19 @@ class OpenSearch(Delta):
         return Schema(
             {
                 "connection": {
-                    "host": str,
-                    "port": Coerce(int),
-                    "user": str,
-                    "password": str,
-                    Optional("url_prefix", default=None): str,
-                    Optional("http_compress", default=True): Coerce(bool),
-                    Optional("ca_cert_path", default="/etc/ssl/certs/"): str,
+                    "host": EnvStr(),
+                    "port": EnvStr(Coerce(int)),
+                    "user": EnvStr(),
+                    "password": EnvStr(),
+                    Optional("url_prefix", default=None): EnvStr(),
+                    Optional("ca_cert_path", default="/etc/ssl/certs/"): EnvStr(),
                     Optional("use_ssl", default=True): Coerce(bool),
                     Optional("verify_certs", default=True): Coerce(bool),
+                    Optional("http_compress", default=True): Coerce(bool),
                 },
                 "processing": {
-                    "index": str,
-                    Optional("timeout", default=60): Coerce(int),
+                    "index": EnvStr(),
+                    Optional("timeout", default=60): EnvStr(Coerce(int)),
                 },
             }
         )
