@@ -7,12 +7,12 @@ from celery import Celery
 from core.app import AppController
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.getLevelName(os.getenv("LOG_LEVEL", "INFO").upper()),
     format="[%(asctime)s: %(levelname)s/%(name)s] %(message)s",
 )
 
 app = Celery(
-    "metric_collector",
+    "Riveer",
     broker=os.getenv("COLLECTOR_BROKER", "amqp://guest@localhost:5672//"),
 )
 app.conf.broker_connection_retry_on_startup = True
@@ -24,7 +24,7 @@ def load_application(**_kwargs):
 
     try:
         tc.load()
-        tc.prepare()
+        tc.configure()
 
     except Exception as e:
         logging.critical("%s: Failed to setup", e.__class__.__name__)

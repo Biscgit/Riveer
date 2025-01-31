@@ -3,7 +3,6 @@ import logging
 import os
 
 import yaml
-
 from voluptuous import Schema, All, Coerce, Optional, Any
 
 from core.graph import NodeGraph
@@ -17,24 +16,25 @@ EnvStr = lambda *t: All(Coerce(lambda s: os.path.expandvars(str(s))), *t)
 class AppController:
     """This is the central controller of the app."""
 
-    def load(self) -> None:
-        """Loads the configurations into the app."""
+    @staticmethod
+    def load():
+        """Loads all available modules into the app."""
         logging.info("Initializing modules.")
         Modules.initialize()
 
+    def configure(self) -> None:
+        """Loads the configurations into the app and initializes tasks."""
         logging.info("Loading configurations.")
         self._load_configurations()
-
-    def prepare(self):
-        """Starts the app and initializes all loaded tasks."""
-        logging.info("Establishing connections")
-        self._establish_connections()
 
         logging.info("Registering cleanup task")
         atexit.register(self._shutdown)
 
-        logging.info("Summoning node tasks")
+        logging.info("Creating and validating node tasks")
         self._create_node_tasks()
+
+        logging.info("Establishing node connections")
+        self._establish_connections()
 
     def _load_configurations(self):
         folder = os.getenv("CONFIG_FOLDER", "./configs")
@@ -48,8 +48,6 @@ class AppController:
 
                 validated_config = self.get_header_schema(default_name)(base_config)
                 self._load_node(validated_config)
-
-        # ToDo: check graph connections!
 
     @staticmethod
     def get_header_schema(default_name: str) -> "Schema":

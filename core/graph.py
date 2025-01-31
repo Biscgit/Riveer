@@ -5,6 +5,7 @@ if typing.TYPE_CHECKING:
 
     type Data = list | dict
     type NodeType = typing.Union[Spring, Flow, Delta]
+    type NodeNameGenerator = typing.Generator[tuple[str, NodeType]]
 
 
 class NodeGraph:
@@ -12,26 +13,29 @@ class NodeGraph:
 
     _pipe_name_mapping: dict[str, "NodeType"] = {}
 
-    @staticmethod
-    def send_result(data: "Data", readers: list[str]) -> None:
+    @classmethod
+    def get(cls, node_name: str) -> typing.Optional["NodeType"]:
+        """Returns the node object for the provided name."""
+        return cls._pipe_name_mapping.get(node_name)
+
+    @classmethod
+    def send_result(cls, data: "Data", readers: list[str]) -> None:
         """Send a data object to many consumers."""
         for reader in readers:
-            node = NodeGraph._pipe_name_mapping[reader]
+            node = cls.get(reader)
             node.function.delay(data)
 
-    @staticmethod
-    def register_node(name: str, node: "NodeType"):
+    @classmethod
+    def register_node(cls, name: str, node: "NodeType"):
         """Adds a new node object to the graph."""
-        if name in NodeGraph._pipe_name_mapping:
+        if name in cls._pipe_name_mapping:
             raise ValueError(f"Node of name `{name}` already exists.")
 
-        NodeGraph._pipe_name_mapping[name] = node
+        cls._pipe_name_mapping[name] = node
 
-    @staticmethod
-    def iter_over_nodes(
-        *filter_cls: type["NodeType"],
-    ) -> typing.Generator[tuple[str, "NodeType"]]:
+    @classmethod
+    def iter_over_nodes(cls, *filter_cls: type["NodeType"]) -> "NodeNameGenerator":
         """Yields every node filtering by the provided classes if any."""
-        for name, node in NodeGraph._pipe_name_mapping.items():
+        for name, node in cls._pipe_name_mapping.items():
             if not filter_cls or isinstance(node, filter_cls):
                 yield name, node

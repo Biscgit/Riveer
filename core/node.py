@@ -16,15 +16,15 @@ class BaseNode(metaclass=ABCMeta):
 
     def __init__(self, config: dict):
         """Registers the function as a celery task."""
-        raw_schema = self.config_schema()
-        config_schema = raw_schema.extend({"configuration": Any(dict)})
-
+        config_schema = self.config_schema().extend({"configuration": Any(dict)})
         self._config = config_schema(config)
-        self.function = celery_app.task(
+
+        _func = celery_app.task(
             self.function,
             name=f"{self.node_type()}-{self.name}-node-process",
             bind=True,
         )
+        self.function = _func  # pylint: disable=E0202
 
     @classmethod
     def id(cls) -> str:
@@ -76,6 +76,11 @@ class PipeWriter(BaseNode, metaclass=ABCMeta):
 class PipeReader(BaseNode, metaclass=ABCMeta):
     """Instances that should be allowed to read from a pipe."""
 
+    @property
+    def output_ids(self) -> list[str]:
+        """Returns the ids of the nodes that should be triggered by this node."""
+        return self._config["processing"]["outputs"]
+
 
 class Spring(PipeWriter, metaclass=ABCMeta):
     """Node element that acts as an input to the system."""
@@ -96,3 +101,7 @@ class Flow(PipeWriter, PipeReader, metaclass=ABCMeta):
 
 class Delta(PipeReader, metaclass=ABCMeta):
     """Node element that acts as an output of the system."""
+
+    @property
+    def output_ids(self) -> list[str]:
+        return []
