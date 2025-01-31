@@ -2,6 +2,7 @@ import logging
 
 from opensearchpy import OpenSearch as OpenSearchConn
 from opensearchpy.helpers import parallel_bulk
+from voluptuous import Schema, Coerce, Optional
 
 from core.node import Delta
 
@@ -19,19 +20,27 @@ class OpenSearch(Delta):
     def from_configuration(cls, config: dict) -> "OpenSearch":
         return cls(config)
 
-    # @staticmethod
-    # def connection_schema() -> dict:
-    #     return {
-    #         "host": Required(str),
-    #         "port": Required(int),
-    #         "user": Required(str),
-    #         "password": Required(str),
-    #         "url_prefix": Optional(str, ""),
-    #         "use_ssl": Optional(bool, True),
-    #         "verify_certs": Optional(bool, True),
-    #         "ca_cert_path": Optional(str, None),
-    #         "pool_maxsize": Optional(int, 16)
-    #     }
+    @staticmethod
+    def config_schema() -> "Schema":
+        return Schema(
+            {
+                "connection": {
+                    "host": str,
+                    "port": Coerce(int),
+                    "user": str,
+                    "password": str,
+                    Optional("url_prefix", default=None): str,
+                    Optional("http_compress", default=True): Coerce(bool),
+                    Optional("ca_cert_path", default="/etc/ssl/certs/"): str,
+                    Optional("use_ssl", default=True): Coerce(bool),
+                    Optional("verify_certs", default=True): Coerce(bool),
+                },
+                "processing": {
+                    "index": str,
+                    Optional("timeout", default=60): Coerce(int),
+                },
+            }
+        )
 
     def connect(self) -> None:
         logging.info("Connecting to OpenSearch database")

@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 import typing
 
 from celery import current_app as celery_app
+from voluptuous import Schema, Any
 
 if typing.TYPE_CHECKING:
     from core.task import CronTask
@@ -13,9 +14,12 @@ if typing.TYPE_CHECKING:
 class BaseNode(metaclass=ABCMeta):
     """This class acts as the base building block for the connected nodes."""
 
-    def __init__(self, config):
+    def __init__(self, config: dict):
         """Registers the function as a celery task."""
-        self._config = config
+        raw_schema = self.config_schema()
+        config_schema = raw_schema.extend({"configuration": Any(dict)})
+
+        self._config = config_schema(config)
         self.function = celery_app.task(
             self.function,
             name=f"{self.node_type()}-{self.name}-node-process",
@@ -41,6 +45,11 @@ class BaseNode(metaclass=ABCMeta):
     @abstractmethod
     def from_configuration(cls: "Self", config: dict) -> "Self":
         """Return an instance for a node using the provided configuration."""
+
+    @staticmethod
+    @abstractmethod
+    def config_schema() -> "Schema":
+        """Returns the schema against which the configuration is validated."""
 
     @abstractmethod
     def connect(self) -> None:
@@ -81,7 +90,7 @@ class Flow(PipeWriter, PipeReader, metaclass=ABCMeta):
     def shutdown(self) -> None:
         return None
 
-    def get_periodic_tasks(self) -> typing.Generator["CronTask"] | list:
+    def get_periodic_tasks(self) -> typing.Iterable["CronTask"]:
         return []
 
 

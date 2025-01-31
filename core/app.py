@@ -1,7 +1,9 @@
-import logging
 import atexit
+import logging
 import os
 import yaml
+
+from voluptuous import Schema, All, Coerce, Optional, Any
 
 from core.graph import NodeGraph
 from core.modules import Modules
@@ -38,7 +40,46 @@ class AppController:
 
             with open(file_path, "r", encoding="utf-8") as f:
                 base_config: dict = yaml.safe_load(f)
-                self._load_node(base_config)
+
+                default_name = file_name.rsplit(".")[0]
+                validated_config = self.validate_config_header(
+                    base_config, default_name
+                )
+                enriched_config = self.enrich_config(validated_config)
+
+                self._load_node(enriched_config)
+
+    def validate_config_header(self, config: dict, default_name: str) -> dict:
+        header_schema = self.get_header_schema(default_name)
+        return header_schema(config)
+
+    def enrich_config(self, config: dict | list | str) -> dict:
+        if isinstance(config, list):
+            for i, value in enumerate(config):
+                config[i] = self.enrich_config(value)
+        elif isinstance(config, dict):
+            for key, value in config.items():
+                config[key] = self.enrich_config(value)
+        elif isinstance(config, str):
+            return os.(config)
+
+        return config
+
+    @staticmethod
+    def get_header_schema(default_name: str) -> "Schema":
+        return Schema(
+            {
+                "configuration": {
+                    "pipe": All(
+                        Coerce(lambda v: v.lower()),
+                        Any("spring", "flow", "delta"),
+                    ),
+                    "type": str,
+                    Optional("name", default=default_name): str,
+                },
+                Any(str): Any(dict, list, str, int),
+            }
+        )
 
     @staticmethod
     def _load_node(base_config: dict) -> None:

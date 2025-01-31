@@ -4,6 +4,7 @@ import typing
 
 from psycopg2.extras import RealDictCursor
 from psycopg2.pool import ThreadedConnectionPool
+from voluptuous import Schema, All, Length, Coerce, Optional
 
 from core.node import Spring
 from core.task import CronTask
@@ -22,49 +23,48 @@ class PostgreSQL(Spring):
     def from_configuration(cls, config: dict) -> "PostgreSQL":
         return cls(config)
 
-    # @staticmethod
-    # def connection_schema():
-    #     return {
-    #         "host": Required(str),
-    #         "port": Required(int),
-    #         "user": Required(str),
-    #         "password": Required(str),
-    #         "database": Required(str),
-    #         "max_connections": Optional(int, 255),
-    #     }
-
-    # @staticmethod
-    # def task_schema():
-    #     return {
-    #         AnyName: {
-    #             "query": Required(str),
-    #             "outputs": Required(list),
-    #             "cron": Optional(str, "*"),
-    #             "name": Optional(str, ""),
-    #             "timeout": Optional(int, 60),
-    #             "fields": Optional(str, None)
-    #         }
-    #     }
+    @staticmethod
+    def config_schema() -> "Schema":
+        return Schema(
+            {
+                "connection": {
+                    "dbname": str,
+                    "user": str,
+                    Optional("password"): str,
+                    Optional("host"): str,
+                    Optional("port"): Coerce(int),
+                    Optional("minconn", default=1): Coerce(int),
+                    Optional("maxconn", default=64): Coerce(int),
+                },
+                "tasks": [
+                    Schema(
+                        {
+                            "name": str,
+                            "cron": str,
+                            "query": str,
+                            "outputs": All(
+                                [str],
+                                Length(
+                                    min=1, msg="At least one output must be defined!"
+                                ),
+                            ),
+                            Optional("timeout", default=60): Coerce(int),
+                            Optional("fields"): [All(str)],
+                        }
+                    )
+                ],
+            }
+        )
 
     def connect(self) -> None:
         logging.info("Connecting to PostgreSQL database")
-
-        conn_conf = self._config["connection"]
-        self._connection = ThreadedConnectionPool(
-            dbname=conn_conf["database"],
-            user=conn_conf["user"],
-            password=conn_conf["password"],
-            host=conn_conf["host"],
-            port=conn_conf["port"],
-            minconn=1,
-            maxconn=conn_conf["max_connections"],
-        )
+        self._connection = ThreadedConnectionPool(**self._config["connection"])
 
     def get_periodic_tasks(self) -> typing.Generator["CronTask"]:
-        for name, config in self._config["tasks"].items():
+        for config in self._config["tasks"]:
             yield CronTask(
                 source=self,
-                task_name=config.get("name", name),
+                task_name=config["name"],
                 task_args=[config["query"], config["timeout"]],
                 task_schedule=config["cron"],
                 task_outputs=config["outputs"],

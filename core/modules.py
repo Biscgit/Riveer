@@ -66,6 +66,5 @@ class Modules:
             module = importlib.import_module(module_name)
 
             for _, cls in inspect.getmembers(module, inspect.isclass):
-                if issubclass(cls, BaseNode) and len(
-                        cls.__abstractmethods__) == 0:
+                if issubclass(cls, BaseNode) and len(cls.__abstractmethods__) == 0:
                     yield cls

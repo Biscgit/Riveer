@@ -29,7 +29,7 @@ class NodeGraph:
 
     @staticmethod
     def iter_over_nodes(
-            *filter_cls: type["NodeType"],
+        *filter_cls: type["NodeType"],
     ) -> typing.Generator[tuple[str, "NodeType"]]:
         """Yields every node filtering by the provided classes if any."""
         for name, node in NodeGraph._pipe_name_mapping.items():
