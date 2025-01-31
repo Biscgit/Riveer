@@ -14,6 +14,8 @@ from core.node import Spring, Flow, Delta
 if typing.TYPE_CHECKING:
     type ConfStruct = typing.Any | dict[str | ConfStruct]
 
+LowerVal = lambda t: All(t, Coerce(lambda s: s.lower()))
+
 
 class AppController:
     """This is the central controller of the app."""
@@ -52,7 +54,7 @@ class AppController:
 
                 self._load_node(enriched_config)
 
-    def enrich_config(self, config: ConfStruct) -> ConfStruct:
+    def enrich_config(self, config: "ConfStruct") -> "ConfStruct":
         if isinstance(config, str):
             return os.path.expandvars(config)
 
@@ -69,12 +71,9 @@ class AppController:
         return Schema(
             {
                 "configuration": {
-                    "pipe": All(
-                        Coerce(lambda v: v.lower()),
-                        Any("spring", "flow", "delta"),
-                    ),
-                    "type": str,
-                    Optional("name", default=default_name): str,
+                    "pipe": All(LowerVal(str), Any("spring", "flow", "delta")),
+                    "type": LowerVal(str),
+                    Optional("name", default=default_name): LowerVal(str),
                 },
                 Any(str): Any(dict, list, str, int),
             }
