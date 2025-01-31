@@ -11,12 +11,12 @@ logger = logging.getLogger("Tasks")
 
 class CronTask:
     def __init__(
-            self,
-            source: "PipeWriter",
-            task_name: str,
-            task_schedule: str,
-            task_args: list | tuple,
-            task_outputs: list[str],
+        self,
+        source: "PipeWriter",
+        task_name: str,
+        task_schedule: str,
+        task_args: list | tuple,
+        task_outputs: list[str],
     ):
         self._source = source
         self.name = f"{source.node_type()}-{source.name}-{task_name}-schedule"

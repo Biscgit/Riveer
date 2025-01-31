@@ -13,14 +13,6 @@ class OpenSearch(Delta):
         self._connection: OpenSearchConn | None = None
         super().__init__(config)
 
-    @classmethod
-    def id(cls) -> str:
-        return "opensearch"
-
-    @classmethod
-    def from_configuration(cls, config: dict) -> "OpenSearch":
-        return cls(config)
-
     @staticmethod
     def config_schema() -> "Schema":
         return Schema(
@@ -69,4 +61,4 @@ class OpenSearch(Delta):
     def shutdown(self) -> None:
         if self._connection is not None:
             self._connection.close()
-        logging.info("Closed all OpenSearch connections for sink %s.", self.name)
+        logging.info("Closed all OpenSearch connections for delta %s.", self.name)

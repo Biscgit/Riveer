@@ -42,9 +42,9 @@ class BaseNode(metaclass=ABCMeta):
         return self._config["configuration"]["name"]
 
     @classmethod
-    @abstractmethod
     def from_configuration(cls: "Self", config: dict) -> "Self":
         """Return an instance for a node using the provided configuration."""
+        return cls(config)
 
     @staticmethod
     @abstractmethod
@@ -55,9 +55,9 @@ class BaseNode(metaclass=ABCMeta):
     def connect(self) -> None:
         """This method is called to connect and check the connection to the source."""
 
-    @abstractmethod
     def shutdown(self) -> None:
         """This method is called for cleaning up on shutdown."""
+        return None
 
     @abstractmethod
     def function(self, data: "Data", *args) -> "Data":  # pylint: disable=E0202

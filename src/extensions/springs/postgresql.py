@@ -16,14 +16,6 @@ class PostgreSQL(Spring):
         self._connection: ThreadedConnectionPool | None = None
         super().__init__(config)
 
-    @classmethod
-    def id(cls) -> str:
-        return "postgresql"
-
-    @classmethod
-    def from_configuration(cls, config: dict) -> "PostgreSQL":
-        return cls(config)
-
     @staticmethod
     def config_schema() -> "Schema":
         return Schema(
