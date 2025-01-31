@@ -1,7 +1,7 @@
 import typing
 
 if typing.TYPE_CHECKING:
-    from core.node import Delta, Flow, Spring
+    from src.core.node import Delta, Flow, Spring
 
     type Data = list | dict
     type NodeType = typing.Union[Spring, Flow, Delta]

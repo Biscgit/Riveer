@@ -1,5 +1,0 @@
-psycopg2~=2.9.10
-opensearch-py~=2.6.0
-celery[gevent]~=5.4.0
-PyYAML~=6.0.2
-voluptuous>=0.15.2

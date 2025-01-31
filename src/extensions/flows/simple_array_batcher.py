@@ -3,8 +3,8 @@ import time
 
 from voluptuous import Schema, All, Length, Coerce, Optional
 
-from core.graph import NodeGraph
-from core.node import Flow
+from src.core.graph import NodeGraph
+from src.core.node import Flow
 
 
 class ArrayBatcher(Flow):

@@ -5,9 +5,9 @@ import os
 import yaml
 from voluptuous import Schema, All, Coerce, Optional, Any
 
-from core.graph import NodeGraph
-from core.modules import Modules
-from core.node import Spring, Flow, Delta
+from src.core.graph import NodeGraph
+from src.core.modules import Modules
+from src.core.node import Spring, Flow, Delta
 
 LowerVal = lambda *t: All(Coerce(lambda s: str(s).lower()), *t)
 EnvStr = lambda *t: All(Coerce(lambda s: os.path.expandvars(str(s))), *t)
@@ -37,7 +37,7 @@ class AppController:
         self._establish_connections()
 
     def _load_configurations(self):
-        folder = os.getenv("CONFIG_FOLDER", "./configs")
+        folder = os.getenv("RIVEER_CONFIG", "./configs")
 
         for file_name in os.listdir(folder):
             file_path = os.path.join(folder, file_name)

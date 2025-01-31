@@ -4,7 +4,7 @@ import sys
 
 from celery import Celery
 
-from core.app import AppController
+from src.core.app import AppController
 
 logging.basicConfig(
     level=logging.getLevelName(os.getenv("LOG_LEVEL", "INFO").upper()),

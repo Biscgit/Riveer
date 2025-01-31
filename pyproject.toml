@@ -1,0 +1,10 @@
+[project]
+name = "riveer"
+version = "0.0.1a1"
+dependencies = [
+    "psycopg2>=2.9.10,<3.0.0",
+    "opensearch-py>=2.6.0,<3.0.0",
+    "celery[gevent]>=5.4.0,<6.0.0",
+    "PyYAML>=6.0.2,<7.0.0",
+    "voluptuous>=0.15.2,<1.0.0",
+]
