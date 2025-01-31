@@ -6,9 +6,9 @@ from psycopg2.extras import RealDictCursor
 from psycopg2.pool import ThreadedConnectionPool
 from voluptuous import Schema, All, Length, Coerce, Optional
 
-from src.core.app import EnvStr
-from src.core.node import Spring
-from src.core.task import CronTask
+from core.app import EnvStr
+from core.node import Spring
+from core.task import CronTask
 
 
 class PostgreSQL(Spring):

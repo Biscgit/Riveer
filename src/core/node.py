@@ -5,7 +5,7 @@ from celery import current_app as celery_app
 from voluptuous import Schema, Any
 
 if typing.TYPE_CHECKING:
-    from src.core.task import CronTask
+    from core.task import CronTask
 
     type Self = type["Self"]
     type Data = list | dict

@@ -5,9 +5,9 @@ import os
 import yaml
 from voluptuous import Schema, All, Coerce, Optional, Any
 
-from src.core.graph import NodeGraph
-from src.core.modules import Modules
-from src.core.node import Spring, Flow, Delta
+from core.graph import NodeGraph
+from core.modules import Modules
+from core.node import Spring, Flow, Delta
 
 LowerVal = lambda *t: All(Coerce(lambda s: str(s).lower()), *t)
 EnvStr = lambda *t: All(Coerce(lambda s: os.path.expandvars(str(s))), *t)

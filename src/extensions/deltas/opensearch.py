@@ -4,8 +4,8 @@ from opensearchpy import OpenSearch as OpenSearchConn
 from opensearchpy.helpers import parallel_bulk
 from voluptuous import Schema, Coerce, Optional
 
-from src.core.app import EnvStr
-from src.core.node import Delta
+from core.app import EnvStr
+from core.node import Delta
 
 
 class OpenSearch(Delta):

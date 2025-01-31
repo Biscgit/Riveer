@@ -2,7 +2,7 @@ import importlib
 import inspect
 import pkgutil
 
-from src.core.node import Spring, Flow, Delta, BaseNode
+from core.node import Spring, Flow, Delta, BaseNode
 
 type NodeClass = type[BaseNode]
 

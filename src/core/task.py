@@ -3,8 +3,8 @@ import logging
 from celery.schedules import crontab
 from celery import current_app as celery_app
 
-from src.core.graph import NodeGraph
-from src.core.node import PipeWriter, PipeReader
+from core.graph import NodeGraph
+from core.node import PipeWriter, PipeReader
 
 logger = logging.getLogger("Tasks")
 
