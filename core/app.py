@@ -1,6 +1,8 @@
 import atexit
 import logging
 import os
+import typing
+
 import yaml
 
 from voluptuous import Schema, All, Coerce, Optional, Any
@@ -8,6 +10,9 @@ from voluptuous import Schema, All, Coerce, Optional, Any
 from core.graph import NodeGraph
 from core.modules import Modules
 from core.node import Spring, Flow, Delta
+
+if typing.TYPE_CHECKING:
+    type ConfStruct = typing.Any | dict[str | ConfStruct]
 
 
 class AppController:
@@ -42,31 +47,25 @@ class AppController:
                 base_config: dict = yaml.safe_load(f)
 
                 default_name = file_name.rsplit(".")[0]
-                validated_config = self.validate_config_header(
-                    base_config, default_name
-                )
+                validated_config = self.get_header_schema(default_name)(base_config)
                 enriched_config = self.enrich_config(validated_config)
 
                 self._load_node(enriched_config)
 
-    def validate_config_header(self, config: dict, default_name: str) -> dict:
-        header_schema = self.get_header_schema(default_name)
-        return header_schema(config)
+    def enrich_config(self, config: ConfStruct) -> ConfStruct:
+        if isinstance(config, str):
+            return os.path.expandvars(config)
 
-    def enrich_config(self, config: dict | list | str) -> dict:
-        if isinstance(config, list):
-            for i, value in enumerate(config):
-                config[i] = self.enrich_config(value)
-        elif isinstance(config, dict):
-            for key, value in config.items():
+        if isinstance(config, typing.Iterable):
+            itr = config.items() if isinstance(config, dict) else enumerate(config)
+            for key, value in itr:
                 config[key] = self.enrich_config(value)
-        elif isinstance(config, str):
-            return os.(config)
 
         return config
 
     @staticmethod
     def get_header_schema(default_name: str) -> "Schema":
+        """This holds the `configuration` schema for the header of the config."""
         return Schema(
             {
                 "configuration": {
