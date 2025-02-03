@@ -33,7 +33,7 @@ class ArrayBatcher(Flow):
             }
         )
 
-    def function(self, data, *args) -> None:
+    def function(self, data, *args) -> list | None:
         proc_conf = self._config["processing"]
 
         if isinstance(data, dict):
@@ -43,7 +43,7 @@ class ArrayBatcher(Flow):
             self._buffer += data
 
             if self._is_batching:
-                return
+                return None
 
             self._is_batching = True
 
@@ -54,4 +54,4 @@ class ArrayBatcher(Flow):
             self._buffer.clear()
             self._is_batching = False
 
-        NodeGraph.send_result(finished_buffer, proc_conf["outputs"])
+        return finished_buffer

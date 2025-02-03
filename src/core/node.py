@@ -4,8 +4,10 @@ import typing
 from celery import current_app as celery_app
 from voluptuous import Schema, Any
 
+from core.task import TaskWrapper
+
 if typing.TYPE_CHECKING:
-    from core.task import CronTask
+    from core.cron import CronTask
 
     type Self = type["Self"]
     type Data = list | dict
@@ -14,10 +16,13 @@ if typing.TYPE_CHECKING:
 class BaseNode(metaclass=ABCMeta):
     """This class acts as the base building block for the connected nodes."""
 
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, use_wrapper: bool = True):
         """Registers the function as a celery task."""
         config_schema = self.config_schema().extend({"configuration": Any(dict)})
         self._config = config_schema(config)
+
+        if use_wrapper:
+            self.function = TaskWrapper(self.function, self.output_ids)
 
         _func = celery_app.task(
             self.function,
@@ -26,6 +31,11 @@ class BaseNode(metaclass=ABCMeta):
         )
         self.function = _func
 
+    @property
+    def output_ids(self) -> list[str]:
+        """Returns the ids of the nodes that should be triggered by this node."""
+        return []
+
     @classmethod
     def id(cls) -> str:
         """Returns the id of the class created from the source."""
@@ -33,7 +43,7 @@ class BaseNode(metaclass=ABCMeta):
 
     @classmethod
     def node_type(cls) -> str:
-        """To be implemented in the different ABC::Nodes."""
+        """Returns the name of the parent class, which should be of node type."""
         return cls.__mro__[1].__name__.lower()
 
     @property
@@ -76,14 +86,16 @@ class PipeWriter(BaseNode, metaclass=ABCMeta):
 class PipeReader(BaseNode, metaclass=ABCMeta):
     """Instances that should be allowed to read from a pipe."""
 
-    @property
-    def output_ids(self) -> list[str]:
-        """Returns the ids of the nodes that should be triggered by this node."""
-        return self._config["processing"]["outputs"]
-
 
 class Spring(PipeWriter, metaclass=ABCMeta):
     """Node element that acts as an input to the system."""
+
+    def __init__(self, config: dict):
+        super().__init__(config, use_wrapper=False)
+
+    @property
+    def output_ids(self) -> list[str]:
+        return list(set(t["name"] for t in self._config["tasks"]))
 
 
 class Flow(PipeWriter, PipeReader, metaclass=ABCMeta):
@@ -98,10 +110,10 @@ class Flow(PipeWriter, PipeReader, metaclass=ABCMeta):
     def get_periodic_tasks(self) -> typing.Iterable["CronTask"]:
         return []
 
+    @property
+    def output_ids(self) -> list[str]:
+        return self._config["processing"]["outputs"]
+
 
 class Delta(PipeReader, metaclass=ABCMeta):
     """Node element that acts as an output of the system."""
-
-    @property
-    def output_ids(self) -> list[str]:
-        return []

@@ -8,7 +8,7 @@ from voluptuous import Schema, All, Length, Coerce, Optional
 
 from core.app import EnvStr
 from core.node import Spring
-from core.task import CronTask
+from core.cron import CronTask
 
 
 class PostgreSQL(Spring):
@@ -62,8 +62,8 @@ class PostgreSQL(Spring):
                 task_outputs=config["outputs"],
             )
 
-    def function(self, *args):
-        query, timeout_seconds = args[0], args[1]
+    def function(self, query, *args):
+        timeout_seconds = args[0]
         conn = self._connection.getconn()
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)

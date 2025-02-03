@@ -27,11 +27,11 @@ class AppController:
         logging.info("Loading configurations.")
         self._load_configurations()
 
-        logging.info("Registering cleanup task")
-        atexit.register(self._shutdown)
-
         logging.info("Creating and validating node tasks")
         self._create_node_tasks()
+
+        logging.info("Registering cleanup task")
+        atexit.register(self._shutdown)
 
         logging.info("Establishing node connections")
         self._establish_connections()
