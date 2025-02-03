@@ -71,9 +71,7 @@ class AppController:
         pipe_type = file_config["pipe"]
         cls = Modules.get_node_cls(pipe_type, file_config["type"])
 
-        NodeGraph.register_node(
-            file_config["name"], cls.from_configuration(base_config)
-        )
+        NodeGraph.register_node(file_config["name"], cls.from_configuration(base_config))
 
     @staticmethod
     def _establish_connections():
@@ -99,7 +97,5 @@ class AppController:
                 try:
                     task.schedule_task_function()
                 except Exception as e:
-                    logging.error(
-                        "Failed to create task `%s` from node `%s`.", task.name, name
-                    )
+                    logging.error("Failed to create task `%s` from node `%s`.", task.name, name)
                     raise e

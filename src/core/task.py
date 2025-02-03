@@ -33,17 +33,11 @@ class CronTask:
         node = NodeGraph.get(node_id)
 
         if node_id in stack:
-            logging.error(
-                "Detected closed loop in node `%s` sending to itself.", node_id
-            )
+            logging.error("Detected closed loop in node `%s` sending to itself.", node_id)
         elif node is None:
-            logging.error(
-                "Node `%s` cannot accept data to because is does not exist.", node_id
-            )
+            logging.error("Node `%s` cannot accept data to because is does not exist.", node_id)
         elif not isinstance(node, PipeReader):
-            logging.error(
-                "Node `%s` is Spring and cannot accept pipeline inputs.", node_id
-            )
+            logging.error("Node `%s` is Spring and cannot accept pipeline inputs.", node_id)
         else:
             for output_id in node.output_ids:
                 self.check_pipeline(output_id, stack + [node_id])

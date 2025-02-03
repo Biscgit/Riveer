@@ -37,9 +37,7 @@ class PostgreSQL(Spring):
                             "query": str,
                             "outputs": All(
                                 [str],
-                                Length(
-                                    min=1, msg="At least one output must be defined!"
-                                ),
+                                Length(min=1, msg="At least one output must be defined!"),
                             ),
                             Optional("timeout", default=60): Coerce(int),
                             Optional("fields"): [str],
