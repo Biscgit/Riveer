@@ -9,10 +9,11 @@ from core.node import Flow
 
 class ArrayBatcher(Flow):
     def __init__(self, config):
+        super().__init__(config)
+
         self._is_batching = False
         self._buffer = []
         self._synchronizer = threading.Lock()
-        super().__init__(config)
 
     @classmethod
     def from_configuration(cls, config: dict) -> "ArrayBatcher":

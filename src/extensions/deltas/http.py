@@ -11,8 +11,9 @@ from core.node import Delta
 
 class BasicHTTP(Delta):
     def __init__(self, config):
-        self._session = requests.Session()
         super().__init__(config)
+
+        self._session = requests.Session()
 
     @staticmethod
     def config_schema() -> "Schema":
