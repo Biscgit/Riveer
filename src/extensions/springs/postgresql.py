@@ -13,8 +13,9 @@ from core.task import CronTask
 
 class PostgreSQL(Spring):
     def __init__(self, config):
-        self._connection: ThreadedConnectionPool | None = None
         super().__init__(config)
+
+        self._connection: ThreadedConnectionPool | None = None
 
     @staticmethod
     def config_schema() -> "Schema":
