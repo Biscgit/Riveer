@@ -12,29 +12,29 @@ class Modules:
     _transform_config_map: dict[str, type["Flow"]] = {}
     _output_config_map: dict[str, type["Delta"]] = {}
 
-    @staticmethod
-    def initialize():
+    @classmethod
+    def initialize(cls):
         """Loads the extensions and processes them."""
-        for cls in Modules._get_extension_cls():
-            if issubclass(cls, Spring):
-                Modules._add_node_cls(cls, Modules._input_config_map)
-            elif issubclass(cls, Flow):
-                Modules._add_node_cls(cls, Modules._transform_config_map)
-            elif issubclass(cls, Delta):
-                Modules._add_node_cls(cls, Modules._output_config_map)
+        for node_cls in cls._get_extension_cls():
+            if issubclass(node_cls, Spring):
+                cls._add_node_cls(node_cls, cls._input_config_map)
+            elif issubclass(node_cls, Flow):
+                cls._add_node_cls(node_cls, cls._transform_config_map)
+            elif issubclass(node_cls, Delta):
+                cls._add_node_cls(node_cls, cls._output_config_map)
             else:
                 raise ValueError("Invalid class provided")
 
-    @staticmethod
-    def get_node_cls(pipe_type: str, pipe_id: str) -> NodeClass:
+    @classmethod
+    def get_node_cls(cls, pipe_type: str, pipe_id: str) -> NodeClass:
         """Returns the corresponding node class to the type and class id"""
         try:
             if pipe_type == "spring":
-                return Modules._input_config_map[pipe_id]
+                return cls._input_config_map[pipe_id]
             if pipe_type == "flow":
-                return Modules._transform_config_map[pipe_id]
+                return cls._transform_config_map[pipe_id]
             if pipe_type == "delta":
-                return Modules._output_config_map[pipe_id]
+                return cls._output_config_map[pipe_id]
 
             raise ValueError(f"Node of type `{pipe_type}` is invalid.")
 
