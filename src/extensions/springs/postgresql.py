@@ -62,8 +62,8 @@ class PostgreSQL(Spring):
                 task_outputs=config["outputs"],
             )
 
-    def function(self, query, *args):
-        timeout_seconds = args[0]
+    def function(self, data, *args):
+        query, timeout_seconds = data, args[0]
         conn = self._connection.getconn()
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
