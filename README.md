@@ -21,8 +21,8 @@ The **Graph** is built from **Nodes** which can be one of three different types:
   handles the sending of processed data to external storages. This **Node** can only read from **Springs** directly or
   **Flows**, but not send to the **Graph**.
 
-The different types of **Nodes** are dynamically loaded on program startup, and are located in the `src/extensions`
-folder.
+The different types of **Nodes** are dynamically loaded on program startup,
+and are located in the `src/extensions/<node>/` folder.
 
 Each **Node** has at least one **Task**. This is the defined function that gets executed when triggering the **Node**.
 This can either happen through a Cron schedule or by a finished **Task** that is sending **Data** to the next **Nodes**
@@ -30,6 +30,9 @@ in the **Graph**. For now **Springs** can have multiple, while **Flows** and **D
 **Task**.
 
 For simplicity, the `Data` that is being passed between Nodes (and Celery threads) must be JSON serializable.
+
+On program start-up, each configuration file gets validated against each **Node**'s schema, 
+as well as ensuring the correct and acyclic connections of the **Graph**.
 
 ### Configuration
 
@@ -40,8 +43,14 @@ environment variable.
 Each configuration file has a *header* under the `configurations` key, which defines the name and type of the **Node**.
 The rest of the file is the configuration for the **Node** itself. For **Springs** and **Deltas**, the configuration
 usually has a `connection` field which is for connecting to outside instances. While **Springs** have a `tasks` field,
-holding a list of configurations for **Tasks**, the other **Nodes** have a `processing` field, for configuring the 
+holding a list of configurations for **Tasks**, the other **Nodes** have a `processing` field, for configuring the
 execution of their **Task**.
+
+Some fields can load environment variables using the `${...}` syntax, which is especially useful for sharing
+configurations while avoiding sharing secrets and separating sensitive information.
+Check each **Node**'s `config_schema()` function for a detailed list of required and optional variables.
+A basic example for transferring data snapshots from [PostgreSQL](https://www.postgresql.org/) to
+[OpenSearch](https://opensearch.org/) can be found in `.example/` folder.
 
 ### Running Locally
 
