@@ -1,4 +1,5 @@
 import logging
+import typing
 
 from celery.schedules import crontab
 from celery import current_app as celery_app
@@ -66,7 +67,7 @@ class CronTask:
         name = f"{self._source.node_type()}-{self._source.name}-{self.name}-schedule"
 
         task = celery_app.task(
-            self._pipe_integration(self._source.function),
+            TaskWrapper(self._source.function, self._output_ids),
             name=name,
             bind=True,
         )
@@ -76,20 +77,28 @@ class CronTask:
             schedule=self._schedule,
         )
 
-    def _pipe_integration(self, func):
-        """This wraps the function to send the result to the next node."""
 
-        def inner(task, *args) -> None:
-            try:
-                logger.info("Running Spring task `%s`", self.name)
+# ToDo: point to invalid or undefined fields on validation!
 
-                result = func(*args)
-                NodeGraph.send_result(result, self._output_ids)
 
-            except Exception as e:
-                logger.error(
-                    "%s | Task %s failed to execute because: %s",
-                    *(e.__class__.__name__, task.name, str(e)),
-                )
+# ToDo: make this function more general and apply to all tasks being run!
+def _task_wrapper(func: typing.Callable, output_ids: list[str]) -> typing.Callable:
+    """This wraps the function to send the result to the next node."""
 
-        return inner
+    def inner(task, *args) -> None:
+        try:
+            logger.info("Running Spring task `%s`", task.name)
+
+            result = func(*args)
+            NodeGraph.send_result(result, output_ids)
+
+        except Exception as e:
+            logger.error(
+                "%s | Task %s failed to execute because: %s",
+                *(e.__class__.__name__, task.name, str(e)),
+            )
+
+    return inner
+
+
+TaskWrapper = _task_wrapper
