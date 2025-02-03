@@ -13,7 +13,7 @@ logging.basicConfig(
 
 app = Celery(
     "Riveer",
-    broker=os.getenv("COLLECTOR_BROKER", "amqp://guest@localhost:5672//"),
+    broker=os.getenv("RIVEER_BROKER", "amqp://guest@localhost:5672//"),
 )
 app.conf.broker_connection_retry_on_startup = True
 
