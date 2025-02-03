@@ -1,7 +1,8 @@
 import logging
+import threading
 
 from opensearchpy import OpenSearch as OpenSearchConn
-from opensearchpy.helpers import parallel_bulk
+from opensearchpy.helpers import bulk
 from voluptuous import Schema, Coerce, Optional
 
 from core.app import EnvStr
@@ -10,8 +11,10 @@ from core.node import Delta
 
 class OpenSearch(Delta):
     def __init__(self, config):
-        self._connection: OpenSearchConn | None = None
         super().__init__(config)
+
+        self._connection: OpenSearchConn | None = None
+        self._synchronizer = threading.Lock()
 
     @staticmethod
     def config_schema() -> "Schema":
@@ -50,13 +53,13 @@ class OpenSearch(Delta):
         )
 
         self._connection.ping()
-        # self._connection.indices.create(self._config["processing"]["index"])
 
     def function(self, data: list[dict], *args) -> None:
         proc_conf = self._config["processing"]
         payload = [d | {"_index": proc_conf["index"]} for d in data]
 
-        parallel_bulk(self._connection, payload, request_timeout=proc_conf["timeout"])
+        with self._synchronizer:
+            bulk(self._connection, payload, request_timeout=proc_conf["timeout"])
 
     def shutdown(self) -> None:
         if self._connection is not None:
