@@ -1,0 +1,13 @@
+configuration:
+  pipe: delta
+  type: opensearch
+
+connection:
+  host: some.opensearch.database
+  port: 443
+  user: ${OPENSEARCH_USER}
+  password: ${OPENSEARCH_PASSWORD}
+
+processing:
+  index: hourly-metrics-${INDEX_SUFFIX}
+  timeout: 10

@@ -1,0 +1,8 @@
+configuration:
+  pipe: flow
+  type: arraybatcher
+  name: custom_flow_name
+
+processing:
+  timeframe: 5
+  outputs: ["delta"]

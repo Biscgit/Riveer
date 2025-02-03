@@ -1,0 +1,17 @@
+configuration:
+  pipe: spring
+  type: postgresql
+
+connection:
+  user: riveer_reader
+  password: ${POSTGRESQL_PASSWORD}
+  dbname: blog_entries
+
+tasks:
+  - name: hourly_row_count
+    cron: "0 * * * *"
+    outputs: ["custom_flow_name"]
+    query: |
+      SELECT CURRENT_TIMESTAMP as timestamp, COUNT(*) AS lines
+      FROM some_table
+      GROUP BY some_field
