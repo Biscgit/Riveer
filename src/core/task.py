@@ -39,6 +39,9 @@ class CronTask:
         elif not isinstance(node, PipeReader):
             logging.error("Node `%s` is Spring and cannot accept pipeline inputs.", node_id)
         else:
+            if not node.output_ids:
+                logger.warning("Node `%s` can write but has no output nodes defined.", node_id)
+
             for output_id in node.output_ids:
                 self.check_pipeline(output_id, stack + [node_id])
             return
