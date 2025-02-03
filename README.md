@@ -2,6 +2,7 @@
 
 A simple query scheduler built on [Celery](https://docs.celeryq.dev/en/stable/) with transforms sending data to multiple
 outputs.
+Run many short and long tasks in parallel often and rarely.
 
 ### Design and Terminology
 
@@ -31,7 +32,7 @@ in the **Graph**. For now **Springs** can have multiple, while **Flows** and **D
 
 For simplicity, the `Data` that is being passed between Nodes (and Celery threads) must be JSON serializable.
 
-On program start-up, each configuration file gets validated against each **Node**'s schema, 
+On program start-up, each configuration file gets validated against each **Node**'s schema,
 as well as ensuring the correct and acyclic connections of the **Graph**.
 
 ### Configuration
@@ -50,7 +51,7 @@ Some fields can load environment variables using the `${...}` syntax, which is e
 configurations while avoiding sharing secrets and separating sensitive information.
 Check each **Node**'s `config_schema()` function for a detailed list of required and optional variables.
 A basic example for transferring data snapshots from [PostgreSQL](https://www.postgresql.org/) to
-[OpenSearch](https://opensearch.org/) can be found in `.example/` folder.
+[OpenSearch](https://opensearch.org/) can be found in `.examples/` folder.
 
 ### Running Locally
 
@@ -71,7 +72,8 @@ You can quickly start RabbitMQ with Docker with the following command:
 docker run -it --rm --name riveer_broker -p 5672:5672 rabbitmq:latest
 ```
 
-Then you can run the `Riveer` with the following command:
+Then you can run the `Riveer` with the following command. Ensure to use a pool witch allows concurrent execution for
+parallel running tasks:
 
 ```shell
 python -m celery -A main worker --beat --pool=threads --loglevel=INFO
