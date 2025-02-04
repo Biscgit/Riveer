@@ -22,8 +22,13 @@ The **Graph** is built from **Nodes** which can be one of three different types:
   handles the sending of processed data to external storages. This **Node** can only read from **Springs** directly or
   **Flows**, but not send to the **Graph**.
 
+The following diagram visualizes the possible interconnections between each **Node** type:
+
+![graph](.github/assets/graph.png)
+
 The different types of **Nodes** are dynamically loaded on program startup,
-and are located in the `src/extensions/<node>/` folder.
+and are located in the `src/extensions/<node>/` folder. 
+See the [Developing](#developing) section for more information on this.
 
 Each **Node** has at least one **Task**. This is the defined function that gets executed when triggering the **Node**.
 This can either happen through a Cron schedule or by a finished **Task** that is sending **Data** to the next **Nodes**
@@ -55,7 +60,7 @@ Check each **Node**'s `config_schema()` function for a detailed list of required
 A basic example for transferring data snapshots from [PostgreSQL](https://www.postgresql.org/) to
 [OpenSearch](https://opensearch.org/) can be found in `.examples/` folder.
 
-### Running Locally 
+### Running Locally
 
 First, you should create a virtual environment of your choice with a python executable.
 After that, install Riveer locally:
@@ -83,4 +88,16 @@ python -m celery -A main worker --beat --pool=threads --loglevel=INFO
 
 ### Developing
 
+The dynamic structure allows easy development of new **Nodes**.
+The following diagram visualizes more closely the abstract structure of the **Nodes**:
 
+![nodes](.github/assets/node_structure.png)
+
+To create a new **Node**, you need to create a new Python file in the `src/extensions/` folder.
+Preferably select the folder with the corresponding type naming of the new **Node**, but it will not affect the loading
+based on folder name.
+In the new file, define a new class which inherits from either `Spring`, `Flow` or `Delta`.
+Do not directly inherit from `GraphWriter` or `GraphReader`, as these classes are not intended for direct inheriting
+and they will raise an error on module loading.
+Define all required methods and properties, and ensure that the `config_schema()` is covering all required fields.
+Restart the application to load the new modules.
