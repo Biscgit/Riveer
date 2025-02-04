@@ -24,7 +24,7 @@ The **Graph** is built from **Nodes** which can be one of three different types:
 
 The following diagram visualizes the possible interconnections between each **Node** type:
 
-![graph](.github/assets/graph.png)
+<img alt="graph" src=".github/assets/graph.png" width="804"/>
 
 The different types of **Nodes** are dynamically loaded on program startup,
 and are located in the `src/extensions/<node>/` folder. 
@@ -91,7 +91,7 @@ python -m celery -A main worker --beat --pool=threads --loglevel=INFO
 The dynamic structure allows easy development of new **Nodes**.
 The following diagram visualizes more closely the abstract structure of the **Nodes**:
 
-![nodes](.github/assets/nodes.png)
+<img alt="nodes" src=".github/assets/nodes.png" width="804"/>
 
 To create a new **Node**, you need to create a new Python file in the `src/extensions/` folder.
 Preferably select the folder with the corresponding type naming of the new **Node**, but it will not affect the loading
