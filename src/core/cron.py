@@ -4,7 +4,7 @@ from celery.schedules import crontab
 from celery import current_app as celery_app
 
 from core.graph import NodeGraph
-from core.node import PipeWriter, PipeReader
+from core.node import GraphWriter, GraphReader
 from core.task import TaskWrapper
 
 logger = logging.getLogger("CronTask")
@@ -13,7 +13,7 @@ logger = logging.getLogger("CronTask")
 class CronTask:
     def __init__(
         self,
-        source: "PipeWriter",
+        source: "GraphWriter",
         task_name: str,
         task_schedule: str,
         task_args: list | tuple,
@@ -37,7 +37,7 @@ class CronTask:
             logging.error("Detected closed loop in node `%s` sending to itself.", node_id)
         elif node is None:
             logging.error("Node `%s` cannot accept data to because is does not exist.", node_id)
-        elif not isinstance(node, PipeReader):
+        elif not isinstance(node, GraphReader):
             logging.error("Node `%s` is Spring and cannot accept pipeline inputs.", node_id)
         else:
             if not node.output_ids:

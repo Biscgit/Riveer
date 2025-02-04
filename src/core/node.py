@@ -75,20 +75,20 @@ class BaseNode(metaclass=ABCMeta):
         In the case of it being a source, this is triggered by the set schedules."""
 
 
-class PipeWriter(BaseNode, metaclass=ABCMeta):
-    """Instances that should be allowed to write to a pipe."""
+class GraphWriter(BaseNode, metaclass=ABCMeta):
+    """Instances that should be allowed to write to the graph."""
 
     @abstractmethod
     def get_periodic_tasks(self) -> typing.Generator["CronTask"]:
         """Loads the functions with input from the config and returns them if any."""
 
 
-class PipeReader(BaseNode, metaclass=ABCMeta):
-    """Instances that should be allowed to read from a pipe."""
+class GraphReader(BaseNode, metaclass=ABCMeta):
+    """Instances that should be allowed to read from the graph."""
 
 
-class Spring(PipeWriter, metaclass=ABCMeta):
-    """Node element that acts as an input to the system."""
+class Spring(GraphWriter, metaclass=ABCMeta):
+    """Node element that acts as an input to the graph."""
 
     def __init__(self, config: dict):
         super().__init__(config, use_wrapper=False)
@@ -98,8 +98,8 @@ class Spring(PipeWriter, metaclass=ABCMeta):
         return list(set(t["name"] for t in self._config["tasks"]))
 
 
-class Flow(PipeWriter, PipeReader, metaclass=ABCMeta):
-    """Node element that acts as a transformer in the system."""
+class Flow(GraphWriter, GraphReader, metaclass=ABCMeta):
+    """Node element that acts as a transformer in the graph."""
 
     def connect(self) -> None:
         return None
@@ -115,5 +115,5 @@ class Flow(PipeWriter, PipeReader, metaclass=ABCMeta):
         return self._config["processing"]["outputs"]
 
 
-class Delta(PipeReader, metaclass=ABCMeta):
-    """Node element that acts as an output of the system."""
+class Delta(GraphReader, metaclass=ABCMeta):
+    """Node element that acts as an output of the graph."""
