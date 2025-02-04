@@ -15,7 +15,7 @@ The **Graph** is built from **Nodes** which can be one of three different types:
   network. This **Node** has multiple periodic **Tasks** which can be configured to run
   using [cron-style](https://crontab.guru/) scheduling. The **Spring** is responsible for fetching data from a specific
   source and sending it into the **Graph** to multiple consumers.
-- **Flow**: This is a **Node** which can transform and modify passed through **Data**. It can be read from **Springs**
+- **Flow**: This is a **Node** which can transform and modify passed through **Data**. It can read from **Springs**
   or other **Flows**, allowing complex workflows, transformations and reusable **Nodes**. After processing, it can send
   the data either to other **Flows** or finally a **Delta**.
 - **Delta**: Finally, similar to a river's delta, this **Node** marks the ends of the **Graph**. In this case, it
