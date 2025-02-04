@@ -26,7 +26,7 @@ class CronTask:
         self._output_ids = task_outputs
 
         for output_id in self._output_ids:
-            self.check_pipeline(output_id, [])
+            self.check_pipeline(output_id, [f"{source.name}/{task_name}"])
 
     def check_pipeline(self, node_id: str, stack: list[str]) -> None:
         """Checks if all specified nodes exist for connection."""

@@ -43,11 +43,13 @@ class AppController:
             file_path = os.path.join(folder, file_name)
 
             with open(file_path, "r", encoding="utf-8") as f:
-                base_config: dict = yaml.safe_load(f)
-                default_name = file_name.rsplit(".")[0]
+                yaml_list = yaml.safe_load_all(f)
 
-                validated_config = self.get_header_schema(default_name)(base_config)
-                self._load_node(validated_config)
+                for base_config in yaml_list:
+                    default_name = file_name.rsplit(".", maxsplit=1)[0]
+                    validated_config = self.get_header_schema(default_name)(base_config)
+
+                    self._load_node(validated_config)
 
     @staticmethod
     def get_header_schema(default_name: str) -> "Schema":

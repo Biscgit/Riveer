@@ -37,9 +37,11 @@ as well as ensuring the correct and acyclic connections of the **Graph**.
 
 ### Configuration
 
-Riveer is configured using `yaml` files and environment variables. For simplicity, each **Node** is defined in its own
-file. The configuration files are located in the `config` folder, which can be overwritten using the `RIVEER_CONFIG`
-environment variable.
+Riveer is configured using `YAML` files and environment variables. For simplicity, each **Node** is defined in its own
+file, but can also be combined in one file using YAML's dash syntax. If no `name` field is provided, by default the
+file's name without the filetype suffix. This can raise errors if you combine multiple configurations in one file
+without providing individual names. The configuration files are located in the `config` folder, which can be
+overwritten using the `RIVEER_CONFIG` environment variable.
 
 Each configuration file has a *header* under the `configurations` key, which defines the name and type of the **Node**.
 The rest of the file is the configuration for the **Node** itself. For **Springs** and **Deltas**, the configuration
@@ -53,7 +55,7 @@ Check each **Node**'s `config_schema()` function for a detailed list of required
 A basic example for transferring data snapshots from [PostgreSQL](https://www.postgresql.org/) to
 [OpenSearch](https://opensearch.org/) can be found in `.examples/` folder.
 
-### Running Locally
+### Running Locally 
 
 First, you should create a virtual environment of your choice with a python executable.
 After that, install Riveer locally:
@@ -78,3 +80,7 @@ parallel running tasks:
 ```shell
 python -m celery -A main worker --beat --pool=threads --loglevel=INFO
 ```
+
+### Developing
+
+
