@@ -93,9 +93,9 @@ python -m celery -A main worker --beat --pool=threads --loglevel=INFO
 The dynamic structure allows easy development of new **Nodes**.
 The following diagram visualizes more closely the abstract structure of the **Nodes**:
 
-<div style="text-align: center;">
+<center>
 <img alt="nodes" src=".github/assets/nodes.png" width="60%"/>
-</div>
+</center>
 
 To create a new **Node**, you need to create a new Python file in the `src/extensions/` folder.
 Preferably select the folder with the corresponding type naming of the new **Node**, but it will not affect the loading
